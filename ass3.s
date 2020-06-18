@@ -129,21 +129,28 @@ section .bss            ; uninitilaized vars
 global main
 global random
 global myexit
+global startFunc
+global endFunc
+global printInt
+global int_format
 extern malloc 
 extern calloc 
 extern free 
 extern sscanf
 extern printf
-
+extern droneFunc
+extern targetFunc
+extern printerFunc
+extern schedulerFunc
 
 
 section .text
 main:
     mov eax, [esp+4]            ; argc
     cmp eax, 6                  ; argc ?== 6 (filename + 5 args)
-    je .parseargs
+    je .parseArgs
     errorExit argc_unmached
-    .parseargs:
+    .parseArgs:
     mov eax, [esp+8]            ;eax <- argv
     mov ebx, [eax+4]            ;ebx <- argv[1]
     my_sscanf1 ebx, int_format, N
@@ -170,9 +177,16 @@ main:
     myMalloc STKSIZE
     add eax, STKSIZE
     mov [ebx+ 8*(ecx-1)+SPP], eax   ;put the ball in the sal
-    mov [ebx+ 8*(ecx-1)+CODEP], dword random   ;a temppurery function addressד
+    mov [ebx+ 8*(ecx-1)+CODEP], dword droneFunc   ;a temppurery function addressד
     loop .allocateStackLoop, ecx
-    ;###########TODO - place real functions address in the right places
+    ;###########place target,printer, schduler in place######
+    ;COs[N]<-target; COs[N+1]<-printer ;COs[N+2]<-scheduler
+    mov ecx, [N]
+    mov [ebx+ 8*ecx+CODEP], dword targetFunc   ;a temppurery function addressד
+    inc ecx
+    mov [ebx+ 8*ecx+CODEP], dword printerFunc   ;a temppurery function addressד
+    inc ecx
+    mov [ebx+ 8*ecx+CODEP], dword schedulerFunc   ;a temppurery function addressד
     ;####### initCOs ######
     mov ecx, [N]
     add ecx, 3
@@ -184,6 +198,12 @@ main:
     add esp, 4  ;silent pop
     loop .initLoop, ecx
 
+    ;debuging<
+    mov ecx, [N]
+    add ecx,2
+    mov eax, [COs]
+    call [eax + 8*ecx+CODEP]
+    ;debuging>
     
 
 myexit:
