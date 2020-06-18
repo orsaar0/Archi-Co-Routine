@@ -1,0 +1,8 @@
+set disassembly-flavor intel
+layout asm
+layout regs
+break b1
+break b2
+break b3
+break b4
+break b5
