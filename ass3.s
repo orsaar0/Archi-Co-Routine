@@ -9,7 +9,7 @@ section .bss            ; uninitilaized vars
     N: resd 1       ;number of drones
     R: resd 1       ;number of full scheduler cycles between each elimination
     K: resd 1       ;how many drone steps between game board printings
-    d: resd 1       ;maximum distance that allows to destroy a target
+    d: resq 1       ;maximum distance that allows to destroy a target
     seed: resd 1    ;seed for initialization of LFSR shift register
 
 
@@ -45,8 +45,12 @@ section .bss            ; uninitilaized vars
     popad
 %endmacro
 %macro printFloat 1
+    ;%1 is a pointer to the float
     pushad
-    push dword %1
+    mov eax, [d]
+    push eax
+    mov eax, [d+4]
+    push eax
     push float_format
     call printf
     add esp, 8
@@ -106,8 +110,8 @@ main:
     ;debug<
     ; mov ecx, [N]
     ; printInt ecx
-    mov ecx, [d]
-    printFloat ecx
+    ; mov ecx, [d]
+    printFloat d
     call random
     ;>debug
 myexit:
