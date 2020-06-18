@@ -6,8 +6,8 @@ game: ass3.o drones.o printer.o scheduler.o target.o
 
 ass3.o: ass3.s
 	nasm -f elf ass3.s -o ass3.o 
-drones.o: drones.s
-	nasm -f elf drones.s -o drones.o
+drone.o: drones.s
+	nasm -f elf drone.s -o drons.o
 printer.o: printer.s
 	nasm -f elf printer.s -o printer.o
 scheduler.o: scheduler.s

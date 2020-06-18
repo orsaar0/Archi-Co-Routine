@@ -73,6 +73,7 @@ section .bss            ; uninitilaized vars
 %endmacro
 %define EXIT_SUCCESS 0
 %define SIGEXIT 1
+%define BOARDSIZE 100
 global main
 global random
 global myexit
