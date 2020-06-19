@@ -1,3 +1,27 @@
+global main
+global random
+global myexit
+global startFunc
+global endFunc
+global printInt
+global int_format
+global N
+global COs
+global resume
+global endCo
+global seed
+global MAXINT
+global CURRDRONE
+global drones
+extern malloc 
+extern calloc 
+extern free 
+extern sscanf
+extern printf
+extern droneFunc
+extern targetFunc
+extern printerFunc
+extern schedulerFunc
 section	.rodata         ;constats
     int_format: db "%d", 10, 0	; format string
     float_format: db "%2f",10,0
@@ -19,6 +43,7 @@ section .bss            ; uninitilaized vars
     CURR: resd 1
     SPT: resd 1     ; temporary stack pointer
     SPMAIN: resd 1  ; stack pointer of main
+    CURRDRONE: resd 1
 %macro	syscall1 2
 	mov	ebx, %2
 	mov	eax, %1
@@ -127,29 +152,6 @@ section .bss            ; uninitilaized vars
 %define score 32
 %define active 36
 %define droneSize 40
-global main
-global random
-global myexit
-global startFunc
-global endFunc
-global printInt
-global int_format
-global N
-global COs
-global resume
-global endCo
-global seed
-global MAXINT
-
-extern malloc 
-extern calloc 
-extern free 
-extern sscanf
-extern printf
-extern droneFunc
-extern targetFunc
-extern printerFunc
-extern schedulerFunc
 
 
 section .text
@@ -175,6 +177,9 @@ main:
     ;###### malloc drones data base#######
     myCalloc [N], droneSize
     mov [drones], eax
+    ; mov [eax], dword 4580 ;debug X value of first drone
+    ;####### init drones data base####
+
     ;###### malloc co-rutine database#######
     mov ecx, [N]
     add ecx, 3          

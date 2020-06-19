@@ -1,12 +1,22 @@
 global droneFunc
 extern seed
-extern MAXINT
+; extern MAXINT
 extern random
 extern resume
 extern COs
 extern N
 extern int_format
 extern printf
+extern drones
+extern CURRDRONE
+%define X 0
+%define Y 8
+%define angle 16
+%define speed 24
+%define score 32
+%define active 36
+%define droneSize 40
+%define MAXINT 65535
 %macro printInt 1
     pushad
     push dword %1
@@ -27,6 +37,18 @@ section .text
 droneFunc:
     push ebp
     mov ebp, esp
+    ;
+    mov ebx, [drones]
+    mov eax, [CURRDRONE]
+    mov edx, droneSize
+    mul edx         ;currdrone id * dronesize
+    add ebx, eax    ;ebx<-pointer to right struct
+    mov eax , [ebx+X]
+    printInt eax
+
+
+    ;
+
     printInt 50
     printInt MAXINT
     ; init X,Y, speed, angle
