@@ -133,6 +133,10 @@ global startFunc
 global endFunc
 global printInt
 global int_format
+global N
+global COs
+global resume
+global endCo
 extern malloc 
 extern calloc 
 extern free 
@@ -197,13 +201,11 @@ main:
     call initCo    
     add esp, 4  ;silent pop
     loop .initLoop, ecx
-
-    ;debuging<
+    ;######## call scheduler######
     mov ecx, [N]
-    add ecx,2
-    mov eax, [COs]
-    call [eax + 8*ecx+CODEP]
-    ;debuging>
+    add ecx, 2
+    push ecx
+    call startCo
     
 
 myexit:
@@ -219,7 +221,7 @@ initCo: ;gets one argument which is CO index
     mov eax, ebx +CODEP ;eax <- func first instruction
     mov [SPT], esp      ;backup main's esp
     mov esp, [ebx+SPP]  ;esp <- co's stack position
-    push eax            ;save func pointer on co's stack
+    push dword [eax]            ;save func pointer on co's stack
     pushfd
     pushad
     mov [ebx+SPP], esp  ;save co's new stack postion
@@ -255,4 +257,36 @@ random:
     loop .shift, ecx
     mov [seed], ax
     printHexa eax
+    endFunc 0
+
+resume:
+    pushfd
+    pushad
+    mov edx, [CURR]     
+    mov [edx+SPP], esp     
+do_resume:
+    mov esp , [ebx+SPP]     ;load CO's stack
+    mov [CURR], ebx         ;CURR<- CO's
+    popad                   ;load registers
+    popfd                   ;load flags
+    ;debug
+    ; pop eax
+    ; printInt eax
+    ; printInt [schedulerFunc]
+    ;debug
+    ret
+
+startCo:
+    startFunc 0
+    pushad
+    mov [SPMAIN], esp
+    mov ebx, [COs]
+    mov eax, [ebp+8]    ;eax <- co-routine ID number
+    mov edx, 8
+    mul edx             ;eax <- co's 8*ID
+    add ebx, eax    ;ebx <- co's struct address
+    jmp do_resume   
+endCo:
+    mov ESP, [SPMAIN] ; restore ESP of main()
+    popad ; restore registers of main()
     endFunc 0

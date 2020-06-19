@@ -1,5 +1,10 @@
 extern int_format
 extern printf
+extern resume
+extern endCo
+extern N
+extern COs
+global schedulerFunc
 %macro printInt 1
     pushad
     push dword %1
@@ -9,11 +14,17 @@ extern printf
     popad
 %endmacro
 section .text
-global schedulerFunc
 schedulerFunc:
-push ebp
-mov ebp, esp
-printInt 100
-mov esp, ebp
-pop ebp
-ret
+    printInt 0
+    mov ecx , [N]
+    .loopCOs:
+        mov ebx, [COs]
+        mov eax, ecx    ;eax <- co-routine ID number
+        dec eax         ;eax <- (ID-1) because arrays
+        mov edx, 8
+        mul edx         ;;eax <- co's 8*ID
+        add ebx, eax    ;ebx <- co's struct
+        call resume
+        loop .loopCOs, ecx
+    jmp endCo
+

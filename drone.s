@@ -1,3 +1,7 @@
+global droneFunc
+extern resume
+extern COs
+extern N
 extern int_format
 extern printf
 %macro printInt 1
@@ -8,12 +12,20 @@ extern printf
     add esp, 8
     popad
 %endmacro
+%macro moveSchedulerToEbx 0
+    mov ebx, [COs]
+        mov eax, [N]  
+        add eax, 2         ;eax <- SchedulerID
+        mov edx, 8
+        mul edx         ;;eax <- co's 8*ID
+        add ebx, eax    ;ebx <- co's struct
+%endmacro
 section .text
-global droneFunc
 droneFunc:
-push ebp
-mov ebp, esp
-printInt 50
-mov esp, ebp
-pop ebp
-ret
+    push ebp
+    mov ebp, esp
+    printInt 50
+    mov esp, ebp
+    pop ebp
+    moveSchedulerToEbx
+    call resume
