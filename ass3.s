@@ -4,8 +4,9 @@ section	.rodata         ;constats
     hexa_format: db "%X",10,0
     argc_unmached: db "ERROR- 5 args is needed",10,0
     STKSIZE equ 16*1024 
-    CODEP equ 0 ; offset of pointer to co-routine function in co-routine struct
-    SPP equ 4 ; offset of pointer to co-routine stack in co-routine struct 
+    CODEP equ 0         ; offset of pointer to co-routine function in co-routine struct
+    SPP equ 4           ; offset of pointer to co-routine stack in co-routine struct 
+    MAXINT equ 65535
 section .data           ; inisiliazed vars
 section .bss            ; uninitilaized vars
     N: resd 1       ;number of drones
@@ -16,8 +17,8 @@ section .bss            ; uninitilaized vars
     drones: resd 1  ;drones database
     COs: resd 1     ;co-routine array
     CURR: resd 1
-    SPT: resd 1 ; temporary stack pointer
-    SPMAIN: resd 1 ; stack pointer of main
+    SPT: resd 1     ; temporary stack pointer
+    SPMAIN: resd 1  ; stack pointer of main
 %macro	syscall1 2
 	mov	ebx, %2
 	mov	eax, %1
@@ -120,12 +121,12 @@ section .bss            ; uninitilaized vars
 %define SIGEXIT 1
 %define BOARDSIZE 100
 %define X 0
-%define Y 4
-%define angle 8
-%define speed 16
-%define score 20
-%define active 24
-%define droneSize 28
+%define Y 8
+%define angle 16
+%define speed 24
+%define score 32
+%define active 36
+%define droneSize 40
 global main
 global random
 global myexit
@@ -137,6 +138,9 @@ global N
 global COs
 global resume
 global endCo
+global seed
+global MAXINT
+
 extern malloc 
 extern calloc 
 extern free 

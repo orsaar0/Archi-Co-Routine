@@ -1,4 +1,7 @@
 global droneFunc
+extern seed
+extern MAXINT
+extern random
 extern resume
 extern COs
 extern N
@@ -25,7 +28,26 @@ droneFunc:
     push ebp
     mov ebp, esp
     printInt 50
+    printInt MAXINT
+    ; init X,Y, speed, angle
+    ; X
+    ; call random         ; eax <-  new [seed]
+    ; fild dword eax      ;convert to float
+    ; fstp qword [X]
+
+    ; call random
+    ; fild dword eax      ;convert to float
+    ; fstp qword [Y]
+    ; call random
+    ; fild dword eax      ;convert to float
+    ; fstp qword [speed]
+
+
+    .loop:
+
+    
+        moveSchedulerToEbx
+        call resume
+
     mov esp, ebp
     pop ebp
-    moveSchedulerToEbx
-    call resume
