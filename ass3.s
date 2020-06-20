@@ -10,11 +10,14 @@ global COs
 global resume
 global endCo
 global seed
+global _360
 global MAXINT
 global CURRDRONE
 global drones
 global targetX
 global targetY
+global float_format
+global BOARDSIZE
 extern malloc 
 extern calloc 
 extern free 
