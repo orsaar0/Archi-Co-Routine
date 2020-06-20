@@ -7,6 +7,7 @@ global printInt
 global int_format
 global N
 global K
+global R
 global COs
 global resume
 global endCo
@@ -233,12 +234,12 @@ main:
         fstp qword [ebx+speed]
         ;set activnse to 1 (true)
         mov [ebx+active], dword 1
-        printFloat ebx+X
-        printFloat ebx+Y
-        printFloat ebx+angle
-        printFloat ebx+speed
-        printInt [ebx+score]     
-        printInt [ebx+active]
+                                            ; printFloat ebx+X
+                                            ; printFloat ebx+Y
+                                            ; printFloat ebx+angle
+                                            ; printFloat ebx+speed
+                                            ; printInt [ebx+score]     
+                                            ; printInt [ebx+active]
         ; loop .activeLoop, ecx
         dec ecx
         cmp ecx, 0

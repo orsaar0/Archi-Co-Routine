@@ -4,6 +4,7 @@ extern resume
 extern endCo
 extern N
 extern K
+extern R
 extern COs
 extern CURRDRONE
 extern drones
@@ -75,11 +76,24 @@ schedulerFunc:
         call resume
         .noTimeToPrint:
 
-
+        ;#####elimination####
+        mov eax, [i]
+        mov edx,0
+        mov ebx, [N]
+        div ebx     ;edx<- i%N ;eax<-i/N
+        cmp edx, 0
+        jne .noTimeForElimination
+        mov ebx, [R]
+        div ebx     ;rdx<- (i/N)%R
+        cmp edx, 0
+        jne .noTimeForElimination
+        ;TODO- elimination code
+        printInt 500
+        .noTimeForElimination:
 
         ;###loop manager####
         inc dword [i]
-        cmp [i], dword 15
+        cmp [i], dword 100
         jl .sch_loop
 
 

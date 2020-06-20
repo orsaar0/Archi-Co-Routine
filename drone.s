@@ -35,7 +35,7 @@ extern CURRDRONE
 %endmacro
 section .text
 droneFunc:
-    printInt [CURRDRONE]
+    ; printInt [CURRDRONE]
     mov ebx, [drones]
     mov eax, [CURRDRONE]
     mov edx, droneSize
