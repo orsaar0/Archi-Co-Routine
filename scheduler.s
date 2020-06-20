@@ -61,19 +61,12 @@ schedulerFunc:
         cmp [i], dword 15
         jl .sch_loop
 
-
-
-    ; mov ecx , [N]
-    ; add ecx, 10
-    ; .loopCOs:
-    ;     mov ebx, [COs]
-    ;     mov eax, ecx    ;eax <- co-routine ID number
-    ;     dec eax         ;eax <- (ID-1) because arrays
-    ;     mov [CURRDRONE], eax ;[CURRDRONE]<- curr drone ID
-    ;     mov edx, 8
-    ;     mul edx         ;;eax <- co's 8*ID
-    ;     add ebx, eax    ;ebx <- co's struct
-    ;     call resume
-    ;     loop .loopCOs, ecx
+    mov ebx, [COs]
+    mov eax, [N]        ;eax        <- curr drone ID
+    inc eax
+    mov ecx, 8
+    mul ecx         ;eax <- co's 8*ID
+    add ebx, eax    ;ebx <- co's struct
+    call resume
     jmp endCo
 
