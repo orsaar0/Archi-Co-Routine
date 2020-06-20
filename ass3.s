@@ -194,7 +194,6 @@ main:
         mul edx
         mov ebx, [drones]
         add ebx, eax
-        printInt ebx
         ;set X
         pushad
         call random

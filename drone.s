@@ -40,8 +40,14 @@ droneFunc:
     mov eax, [CURRDRONE]
     mov edx, droneSize
     mul edx         ;currdrone id * dronesize
-    add ebx, eax    ;ebx<-pointer to right struct
+    add ebx, eax    ;ebx<-drones[i]
+
+
     mov eax , [ebx+X]
+    mov eax , [ebx+Y]
+    mov eax , [ebx+active]
+
+
     ; printInt eax
 
 
