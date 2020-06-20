@@ -31,6 +31,7 @@ section	.rodata         ;constats
     argc_unmached: db "ERROR- 5 args is needed",10,0
     MAXINT: dd 65535
     BOARDSIZE: dd 100
+    _360: dd 360
     STKSIZE equ 16*1024 
     CODEP equ 0         ; offset of pointer to co-routine function in co-routine struct
     SPP equ 4           ; offset of pointer to co-routine stack in co-routine struct 
@@ -186,16 +187,63 @@ main:
     mov [drones], eax
     ;####### init drones data base####
         mov ecx, [N]
-        .activeLoop:
+        .initDronesLoop:
         mov eax, ecx
         dec eax
         mov edx , droneSize
         mul edx
         mov ebx, [drones]
         add ebx, eax
-        add ebx, active 
-        mov [ebx], dword 1
-        loop .activeLoop, ecx
+        printInt ebx
+        ;set X
+        pushad
+        call random
+        popad
+        fild dword [seed]
+        fild dword [MAXINT]
+        fdivp
+        fimul dword [BOARDSIZE]
+        fstp qword [ebx+X]
+        ;set Y
+        pushad
+        call random
+        popad
+        fild dword [seed]
+        fild dword [MAXINT]
+        fdivp
+        fimul dword [BOARDSIZE]
+        fstp qword [ebx+Y]
+        ;set angle
+        pushad
+        call random
+        popad
+        fild dword [seed]
+        fild dword [MAXINT]
+        fdivp
+        fimul dword [_360]
+        fstp qword [ebx+angle]
+        ;set speed
+        pushad
+        call random
+        popad
+        fild dword [seed]
+        fild dword [MAXINT]
+        fdivp
+        fimul dword [BOARDSIZE]
+        fstp qword [ebx+speed]
+        ;set activnse to 1 (true)
+        mov [ebx+active], dword 1
+        printFloat ebx+X
+        printFloat ebx+Y
+        printFloat ebx+angle
+        printFloat ebx+speed
+        printInt [ebx+score]     
+        printInt [ebx+active]
+        ; loop .activeLoop, ecx
+        dec ecx
+        cmp ecx, 0
+        jne .initDronesLoop
+
     ;####init target######
     call random
     fild dword [seed]
