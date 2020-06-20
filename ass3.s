@@ -17,6 +17,7 @@ global CURRDRONE
 global drones
 global targetX
 global targetY
+global numOfActiveDrones
 extern malloc 
 extern calloc 
 extern free 
@@ -54,6 +55,7 @@ section .bss            ; uninitilaized vars
     targetX: resq 1
     targetY: resq 1
     stacksHolder: resd 1
+    numOfActiveDrones: resd 1
 %macro	syscall1 2
 	mov	ebx, %2
 	mov	eax, %1
@@ -174,6 +176,8 @@ main:
     mov eax, [esp+8]            ;eax <- argv
     mov ebx, [eax+4]            ;ebx <- argv[1]
     my_sscanf1 ebx, int_format, N
+    mov edx, [N]
+    mov [numOfActiveDrones], edx
     mov ebx, [eax+8]            ;ebx <- argv[2]
     my_sscanf1 ebx, int_format, R
     mov ebx, [eax+12]            ;ebx <- argv[3]
@@ -232,6 +236,8 @@ main:
         fdivp
         fimul dword [BOARDSIZE]
         fstp qword [ebx+speed]
+        ;set score for debuging
+        mov [ebx+score], ecx
         ;set activnse to 1 (true)
         mov [ebx+active], dword 1
                                             ; printFloat ebx+X

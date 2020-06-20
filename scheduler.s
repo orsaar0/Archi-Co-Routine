@@ -8,6 +8,7 @@ extern R
 extern COs
 extern CURRDRONE
 extern drones
+extern numOfActiveDrones
 global schedulerFunc
 section .data
     i: dd 0
@@ -27,6 +28,11 @@ section .data
     add esp, 8
     popad
 %endmacro
+section .data
+looserIndex: dd -1
+looserScore: dd 2147483647 ; maxint
+section .rodata:
+winnerFormat: db "The Winner is: %d",10,0
 section .text
 schedulerFunc:
     .sch_loop:
@@ -88,14 +94,75 @@ schedulerFunc:
         cmp edx, 0
         jne .noTimeForElimination
         ;TODO- elimination code
-        printInt 500
+            mov ecx, [N]
+            .LooserLoop:
+            mov eax, ecx
+            dec eax
+            mov edx , droneSize
+            mul edx
+            mov ebx, [drones]
+            add ebx, eax    ; ebx<- drones[i]
+            mov eax, [ebx+active]
+            cmp eax, 0
+            je .endloop
+            mov eax, [looserScore]
+            cmp eax, [ebx+score]    ;is oldscore bigger than curr score?
+            jg .newLooser
+            jmp .endloop
+            .newLooser:
+                mov eax, [ebx+score]
+                mov [looserScore], eax
+                mov eax, ecx
+                dec eax
+                mov [looserIndex], eax
+            .endloop:
+                dec ecx
+                cmp ecx, 0
+                jg .LooserLoop
+            printInt [looserIndex]
+            mov eax, [looserIndex]
+            mov edx , droneSize
+            mul edx
+            mov ebx, [drones]
+            add ebx, eax    ; ebx<- drones[i]
+            mov [ebx+active], dword 0
+            dec dword [numOfActiveDrones]
+            mov [looserScore], dword 2147483647
+            mov [looserIndex], dword -1
         .noTimeForElimination:
 
+        ;#####ENDGAME#######
+        mov eax, [numOfActiveDrones]
+        cmp eax, 1
+        je .endgame
+        jmp .loopmanager
+        .endgame:
+            mov ecx, [N]
+            .loopOfDoom:
+            mov eax, ecx
+            dec eax
+            mov edx , droneSize
+            mul edx
+            mov ebx, [drones]
+            add ebx, eax    ; ebx<- drones[i]
+            mov eax, [ebx+active]
+            cmp eax, 1
+            jne .notwinner
+            pushad
+            push ecx
+            push winnerFormat
+            call printf
+            add esp, 8
+            popad
+            jmp endCo
+            .notwinner:
+            dec ecx
+            cmp ecx, 0
+            jg .loopOfDoom
         ;###loop manager####
+        .loopmanager:
         inc dword [i]
         cmp [i], dword 100
         jl .sch_loop
 
-
-    jmp endCo
 
