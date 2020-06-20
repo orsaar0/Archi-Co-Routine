@@ -18,6 +18,9 @@ global drones
 global targetX
 global targetY
 global numOfActiveDrones
+global CURR
+global BOARDSIZE
+global float_format
 extern malloc 
 extern calloc 
 extern free 

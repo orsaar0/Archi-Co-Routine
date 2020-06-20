@@ -48,6 +48,14 @@ droneFunc:
     mov eax , [ebx+active]
 
 
+
+    ;call target
+    mov eax, [N]
+    mov edx, 8
+    mul edx         ;eax <- co's 8*ID
+    mov ebx, [COs]
+    add ebx, eax    ;ebx <- COs[i]
+    call resume
     ; printInt eax
 
 

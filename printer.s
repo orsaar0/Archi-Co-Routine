@@ -1,3 +1,4 @@
+global printerFunc
 extern targetX
 extern targetY
 extern resume
@@ -30,7 +31,6 @@ extern CURRDRONE
         mul edx         ;;eax <- co's 8*ID
         add ebx, eax    ;ebx <- co's struct
 %endmacro
-global printerFunc
 printFormat: db "%2f, %2f, %2f, %2f, %d, %d",10,0
 printerFunc:
         mov ecx, [N]

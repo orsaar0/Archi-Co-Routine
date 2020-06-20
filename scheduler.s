@@ -84,7 +84,7 @@ schedulerFunc:
 
         ;#####elimination####
         mov eax, [i]
-        mov edx,0
+        mov edx, 0
         mov ebx, [N]
         div ebx     ;edx<- i%N ;eax<-i/N
         cmp edx, 0
