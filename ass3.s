@@ -6,6 +6,7 @@ global endFunc
 global printInt
 global int_format
 global N
+global K
 global COs
 global resume
 global endCo

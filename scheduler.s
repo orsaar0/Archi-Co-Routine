@@ -3,6 +3,7 @@ extern printf
 extern resume
 extern endCo
 extern N
+extern K
 extern COs
 extern CURRDRONE
 extern drones
@@ -57,16 +58,30 @@ schedulerFunc:
         add ebx, eax    ;ebx <- co's struct
         call resume
         .droneNotActive:
+
+        ;####Printer#####
+        mov eax, [i]
+        mov edx,0
+        mov ebx, [K]
+        div ebx     ;edx<- i%N (it's realy edx belive me)
+        cmp edx, 0
+        jne .noTimeToPrint
+        mov ebx, [COs]
+        mov eax, [N]        ;eax        <- curr drone ID
+        inc eax
+        mov ecx, 8
+        mul ecx         ;eax <- co's 8*ID
+        add ebx, eax    ;ebx <- co's struct
+        call resume
+        .noTimeToPrint:
+
+
+
+        ;###loop manager####
         inc dword [i]
         cmp [i], dword 15
         jl .sch_loop
 
-    mov ebx, [COs]
-    mov eax, [N]        ;eax        <- curr drone ID
-    inc eax
-    mov ecx, 8
-    mul ecx         ;eax <- co's 8*ID
-    add ebx, eax    ;ebx <- co's struct
-    call resume
+
     jmp endCo
 
