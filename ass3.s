@@ -30,6 +30,7 @@ section	.rodata         ;constats
     hexa_format: db "%X",10,0
     argc_unmached: db "ERROR- 5 args is needed",10,0
     MAXINT: dd 65535
+    BOARDSIZE: dd 100
     STKSIZE equ 16*1024 
     CODEP equ 0         ; offset of pointer to co-routine function in co-routine struct
     SPP equ 4           ; offset of pointer to co-routine stack in co-routine struct 
@@ -84,8 +85,8 @@ section .bss            ; uninitilaized vars
 %macro printFloat 1
     ;%1 is a pointer to the float
     pushad
-    push dword [d+4]
-    push dword [d]
+    push dword [%1+4]
+    push dword [%1]
     push float_format
     call printf
     add esp, 12
@@ -150,7 +151,6 @@ section .bss            ; uninitilaized vars
 %endmacro
 %define EXIT_SUCCESS 0
 %define SIGEXIT 1
-%define BOARDSIZE 100
 %define X 0
 %define Y 8
 %define angle 16
@@ -179,23 +179,36 @@ main:
     my_sscanf1 ebx, int_format, d
     fild dword [d]               ;convert to float
     fstp qword [d]
-    printFloat [d]
     mov ebx, [eax+20]            ;ebx <- argv[5]
     my_sscanf1 ebx, int_format, seed
     ;###### malloc drones data base#######
     myCalloc [N], droneSize
     mov [drones], eax
-    mov [eax+active], dword 1 ;debug X value of first drone
     ;####### init drones data base####
-        ;####init target######
-        fld1
-        fild dword [MAXINT]
-        fdivp
-        fstp qword [targetX]
-        fstp qword [targetX]
-        fstp qword [targetX]
-
-        printFloat targetX
+        mov ecx, [N]
+        .activeLoop:
+        mov eax, ecx
+        dec eax
+        mov edx , droneSize
+        mul edx
+        mov ebx, [drones]
+        add ebx, eax
+        add ebx, active 
+        mov [ebx], dword 1
+        loop .activeLoop, ecx
+    ;####init target######
+    call random
+    fild dword [seed]
+    fild dword [MAXINT]
+    fdivp
+    fimul dword [BOARDSIZE]
+    fstp qword [targetX]
+    call random
+    fild dword [seed]
+    fild dword [MAXINT]
+    fdivp
+    fimul dword [BOARDSIZE]
+    fstp qword [targetY]
     ;###### malloc co-rutine database#######
     mov ecx, [N]
     add ecx, 3          
@@ -295,7 +308,7 @@ random:
     or  ax, dx
     loop .shift, ecx
     mov [seed], ax
-    printHexa eax
+    ; printHexa eax
     endFunc 0
 
 resume:

@@ -33,6 +33,7 @@ schedulerFunc:
         mov edx,0
         mov ebx, [N]
         div ebx     ;edx<- i%N (it's realy edx belive me)
+        ; printInt edx
         ;get activnes of drone (be careful not to override edx)
         mov eax, edx        ;eax <- drones id
         mov ebx, [drones]   ;ebx <- drones array
@@ -41,8 +42,13 @@ schedulerFunc:
         add ebx, eax        ;ebx<- pointer to right struct
         mov eax , [ebx+active]
         cmp eax, 0
-        je .droneNotActive
+        je .droneNotActive ;i need this!!
         .isActive:
+        ;calc [i]%n again
+        mov eax, [i]
+        mov edx,0
+        mov ebx, [N]
+        div ebx     ;edx<- i%N (it's realy edx belive me)
         mov ebx, [COs]
         mov eax, edx        ;eax        <- curr drone ID
         mov [CURRDRONE], edx   ;[CURRDRONE]<- curr drone ID
