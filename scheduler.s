@@ -3,9 +3,12 @@ extern printf
 extern resume
 extern endCo
 extern N
+extern K
+extern R
 extern COs
 extern CURRDRONE
 extern drones
+extern numOfActiveDrones
 global schedulerFunc
 section .data
     i: dd 0
@@ -25,6 +28,11 @@ section .data
     add esp, 8
     popad
 %endmacro
+section .data
+looserIndex: dd -1
+looserScore: dd 2147483647 ; maxint
+section .rodata:
+winnerFormat: db "The Winner is: %d",10,0
 section .text
 schedulerFunc:
     .sch_loop:
@@ -57,23 +65,104 @@ schedulerFunc:
         add ebx, eax    ;ebx <- co's struct
         call resume
         .droneNotActive:
+
+        ;####Printer#####
+        mov eax, [i]
+        mov edx,0
+        mov ebx, [K]
+        div ebx     ;edx<- i%N (it's realy edx belive me)
+        cmp edx, 0
+        jne .noTimeToPrint
+        mov ebx, [COs]
+        mov eax, [N]        ;eax        <- curr drone ID
+        inc eax
+        mov ecx, 8
+        mul ecx         ;eax <- co's 8*ID
+        add ebx, eax    ;ebx <- co's struct
+        call resume
+        .noTimeToPrint:
+
+        ;#####elimination####
+        mov eax, [i]
+        mov edx, 0
+        mov ebx, [N]
+        div ebx     ;edx<- i%N ;eax<-i/N
+        cmp edx, 0
+        jne .noTimeForElimination
+        mov ebx, [R]
+        div ebx     ;rdx<- (i/N)%R
+        cmp edx, 0
+        jne .noTimeForElimination
+        ;TODO- elimination code
+            mov ecx, [N]
+            .LooserLoop:
+            mov eax, ecx
+            dec eax
+            mov edx , droneSize
+            mul edx
+            mov ebx, [drones]
+            add ebx, eax    ; ebx<- drones[i]
+            mov eax, [ebx+active]
+            cmp eax, 0
+            je .endloop
+            mov eax, [looserScore]
+            cmp eax, [ebx+score]    ;is oldscore bigger than curr score?
+            jg .newLooser
+            jmp .endloop
+            .newLooser:
+                mov eax, [ebx+score]
+                mov [looserScore], eax
+                mov eax, ecx
+                dec eax
+                mov [looserIndex], eax
+            .endloop:
+                dec ecx
+                cmp ecx, 0
+                jg .LooserLoop
+            printInt [looserIndex]
+            mov eax, [looserIndex]
+            mov edx , droneSize
+            mul edx
+            mov ebx, [drones]
+            add ebx, eax    ; ebx<- drones[i]
+            mov [ebx+active], dword 0
+            dec dword [numOfActiveDrones]
+            mov [looserScore], dword 2147483647
+            mov [looserIndex], dword -1
+        .noTimeForElimination:
+
+        ;#####ENDGAME#######
+        mov eax, [numOfActiveDrones]
+        cmp eax, 1
+        je .endgame
+        jmp .loopmanager
+        .endgame:
+            mov ecx, [N]
+            .loopOfDoom:
+            mov eax, ecx
+            dec eax
+            mov edx , droneSize
+            mul edx
+            mov ebx, [drones]
+            add ebx, eax    ; ebx<- drones[i]
+            mov eax, [ebx+active]
+            cmp eax, 1
+            jne .notwinner
+            pushad
+            push ecx
+            push winnerFormat
+            call printf
+            add esp, 8
+            popad
+            jmp endCo
+            .notwinner:
+            dec ecx
+            cmp ecx, 0
+            jg .loopOfDoom
+        ;###loop manager####
+        .loopmanager:
         inc dword [i]
-        cmp [i], dword 15
+        cmp [i], dword 100
         jl .sch_loop
 
-
-
-    ; mov ecx , [N]
-    ; add ecx, 10
-    ; .loopCOs:
-    ;     mov ebx, [COs]
-    ;     mov eax, ecx    ;eax <- co-routine ID number
-    ;     dec eax         ;eax <- (ID-1) because arrays
-    ;     mov [CURRDRONE], eax ;[CURRDRONE]<- curr drone ID
-    ;     mov edx, 8
-    ;     mul edx         ;;eax <- co's 8*ID
-    ;     add ebx, eax    ;ebx <- co's struct
-    ;     call resume
-    ;     loop .loopCOs, ecx
-    jmp endCo
 

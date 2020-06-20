@@ -6,6 +6,8 @@ global endFunc
 global printInt
 global int_format
 global N
+global K
+global R
 global COs
 global resume
 global endCo
@@ -16,8 +18,10 @@ global CURRDRONE
 global drones
 global targetX
 global targetY
-global float_format
+global numOfActiveDrones
+global CURR
 global BOARDSIZE
+global float_format
 extern malloc 
 extern calloc 
 extern free 
@@ -55,6 +59,7 @@ section .bss            ; uninitilaized vars
     targetX: resq 1
     targetY: resq 1
     stacksHolder: resd 1
+    numOfActiveDrones: resd 1
 %macro	syscall1 2
 	mov	ebx, %2
 	mov	eax, %1
@@ -175,6 +180,8 @@ main:
     mov eax, [esp+8]            ;eax <- argv
     mov ebx, [eax+4]            ;ebx <- argv[1]
     my_sscanf1 ebx, int_format, N
+    mov edx, [N]
+    mov [numOfActiveDrones], edx
     mov ebx, [eax+8]            ;ebx <- argv[2]
     my_sscanf1 ebx, int_format, R
     mov ebx, [eax+12]            ;ebx <- argv[3]
@@ -233,14 +240,16 @@ main:
         fdivp
         fimul dword [BOARDSIZE]
         fstp qword [ebx+speed]
+        ;set score for debuging
+        mov [ebx+score], ecx
         ;set activnse to 1 (true)
         mov [ebx+active], dword 1
-        printFloat ebx+X
-        printFloat ebx+Y
-        printFloat ebx+angle
-        printFloat ebx+speed
-        printInt [ebx+score]     
-        printInt [ebx+active]
+                                            ; printFloat ebx+X
+                                            ; printFloat ebx+Y
+                                            ; printFloat ebx+angle
+                                            ; printFloat ebx+speed
+                                            ; printInt [ebx+score]     
+                                            ; printInt [ebx+active]
         ; loop .activeLoop, ecx
         dec ecx
         cmp ecx, 0
