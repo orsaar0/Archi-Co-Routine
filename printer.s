@@ -1,4 +1,4 @@
-section .text
+extern targetX
+extern targetY
 global printerFunc
 printerFunc:
-ret

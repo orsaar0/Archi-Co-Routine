@@ -35,22 +35,16 @@ extern CURRDRONE
 %endmacro
 section .text
 droneFunc:
-    push ebp
-    mov ebp, esp
-    ;
     mov ebx, [drones]
     mov eax, [CURRDRONE]
     mov edx, droneSize
     mul edx         ;currdrone id * dronesize
     add ebx, eax    ;ebx<-pointer to right struct
-    mov eax , [ebx+X]
-    printInt eax
+    ; mov eax , [ebx+X]
+    ; printInt eax
 
 
-    ;
 
-    printInt 50
-    printInt MAXINT
     ; init X,Y, speed, angle
     ; X
     ; call random         ; eax <-  new [seed]
@@ -63,13 +57,11 @@ droneFunc:
     ; call random
     ; fild dword eax      ;convert to float
     ; fstp qword [speed]
-
+    printInt -1
 
     .loop:
 
     
-        moveSchedulerToEbx
-        call resume
-
-    mov esp, ebp
-    pop ebp
+    moveSchedulerToEbx
+    call resume
+    jmp droneFunc

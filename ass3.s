@@ -13,6 +13,8 @@ global seed
 global MAXINT
 global CURRDRONE
 global drones
+global targetX
+global targetY
 extern malloc 
 extern calloc 
 extern free 
@@ -27,10 +29,11 @@ section	.rodata         ;constats
     float_format: db "%2f",10,0
     hexa_format: db "%X",10,0
     argc_unmached: db "ERROR- 5 args is needed",10,0
+    MAXINT: dd 65535
     STKSIZE equ 16*1024 
     CODEP equ 0         ; offset of pointer to co-routine function in co-routine struct
     SPP equ 4           ; offset of pointer to co-routine stack in co-routine struct 
-    MAXINT equ 65535
+
 section .data           ; inisiliazed vars
 section .bss            ; uninitilaized vars
     N: resd 1       ;number of drones
@@ -44,6 +47,9 @@ section .bss            ; uninitilaized vars
     SPT: resd 1     ; temporary stack pointer
     SPMAIN: resd 1  ; stack pointer of main
     CURRDRONE: resd 1
+    targetX: resq 1
+    targetY: resq 1
+    stacksHolder: resd 1
 %macro	syscall1 2
 	mov	ebx, %2
 	mov	eax, %1
@@ -156,6 +162,7 @@ section .bss            ; uninitilaized vars
 
 section .text
 main:
+    finit                       ;initilize x87
     mov eax, [esp+4]            ; argc
     cmp eax, 6                  ; argc ?== 6 (filename + 5 args)
     je .parseArgs
@@ -172,24 +179,37 @@ main:
     my_sscanf1 ebx, int_format, d
     fild dword [d]               ;convert to float
     fstp qword [d]
+    printFloat [d]
     mov ebx, [eax+20]            ;ebx <- argv[5]
     my_sscanf1 ebx, int_format, seed
     ;###### malloc drones data base#######
     myCalloc [N], droneSize
     mov [drones], eax
-    ; mov [eax], dword 4580 ;debug X value of first drone
+    mov [eax+active], dword 1 ;debug X value of first drone
     ;####### init drones data base####
+        ;####init target######
+        fld1
+        fild dword [MAXINT]
+        fdivp
+        fstp qword [targetX]
+        fstp qword [targetX]
+        fstp qword [targetX]
 
+        printFloat targetX
     ;###### malloc co-rutine database#######
     mov ecx, [N]
     add ecx, 3          
     myCalloc ecx, 8     ;each CO has 4 bytes points to STACK and 4 bytes points function
     mov [COs], eax
+    myCalloc ecx, 4
+    mov [stacksHolder], eax
     .allocateStackLoop: ;ecx is index
-    mov ebx, [COs]
     myMalloc STKSIZE
+    mov ebx, [stacksHolder]
+    mov [ebx + 4*(ecx-1)], eax ;stacksHolder[i]<- start of stack
+    mov ebx, [COs]
     add eax, STKSIZE
-    mov [ebx+ 8*(ecx-1)+SPP], eax   ;put the ball in the sal
+    mov [ebx+ 8*(ecx-1)+SPP], eax   ;COs[i]<- end of stack
     mov [ebx+ 8*(ecx-1)+CODEP], dword droneFunc   ;a temppurery function addressד
     loop .allocateStackLoop, ecx
     ;###########place target,printer, schduler in place######
@@ -218,6 +238,16 @@ main:
     
 
 myexit:
+myFree [drones]
+mov ecx, [N]
+add ecx, 3          
+.freeStackLoop: ;ecx is index
+    mov ebx, [stacksHolder]
+    mov eax, [ebx+ 4*(ecx-1)]   ;put the ball in the sal
+    myFree eax
+loop .freeStackLoop, ecx
+myFree [COs]
+myFree [stacksHolder]
 exit EXIT_SUCCESS
 
 initCo: ;gets one argument which is CO index
