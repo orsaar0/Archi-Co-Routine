@@ -12,6 +12,7 @@ extern int_format
 extern printf
 extern drones
 extern CURRDRONE
+extern mayDestroy
 %define X 0
 %define Y 8
 %define angle 16
@@ -35,9 +36,9 @@ extern CURRDRONE
     mul edx         ;;eax <- co's 8*ID
     add ebx, eax    ;ebx <- co's struct
 %endmacro
-%macro checkBorders 1
+%macro checkBorders 2
     fld qword [%1]
-    fld dword [hundred]
+    fld dword [%2]
     fcomip
     jb %%sub
     fld dword [zero]
@@ -46,10 +47,10 @@ extern CURRDRONE
     jmp %%good
     
     %%sub:
-        fsub dword [hundred]
+        fsub dword [%2]
         jmp %%good
     %%add:
-        fadd dword [hundred]
+        fadd dword [%2]
     %%good:
         fstp qword [%1]
 
@@ -68,34 +69,42 @@ section .data
 one_eighty: dd 180.0
 hundred: dd 100.0
 zero: dd 0.0
-_360: dd 360.0
+twenty: dd 20.0
+ten: dd 10.0
+sixty: dd 60.0
+hundred_twenty: dd 120.0
+one: dd 1.0
 section .bss
 delta_angle: resq 1
 delta_speed: resq 1
 section .text
 droneFunc:
     finit
-    ; set random delta angle
+; set random delta angle
     pushad
     call random
     popad
     fild dword [seed]
     fild dword [MAXINT]
     fdivp
-    fimul dword [_360]
+    fmul dword [hundred_twenty]
+    fld dword [sixty]
+    fsubp
     fstp qword [delta_angle]
 
-    ; set random delta speed
+; set random delta speed
     pushad
     call random
     popad
     fild dword [seed]
     fild dword [MAXINT]
     fdivp
-    fmul dword [hundred]
+    fmul dword [twenty]
+    fld dword [ten]
+    fsubp
     fstp qword [delta_speed]
     
-    ; get curr drone ptr -> ebx
+; get curr drone ptr -> ebx
     printInt [CURRDRONE]
     mov ebx, [drones]
     mov eax, [CURRDRONE]
@@ -103,7 +112,7 @@ droneFunc:
     mul edx         ;currdrone id * dronesize
     add ebx, eax    ;ebx<-drones[i]
 
-    ; calc new position
+; calc new position
     fld qword [ebx+angle]
     fldpi
     fmulp
@@ -115,7 +124,7 @@ droneFunc:
     fld qword [ebx+X]
     faddp                   ; st(0) <- currX + speed*(cos(angle))
     fstp qword [ebx+X]
-    checkBorders ebx+X
+    checkBorders ebx+X, hundred
 
     ;debug
     printFloat ebx+X
@@ -125,46 +134,52 @@ droneFunc:
     fld qword [ebx+Y]
     faddp                   ; st(0) <- currY + speed*(sin(angle))  
     fstp qword [ebx+Y]
-    checkBorders ebx+Y
+    checkBorders ebx+Y, hundred
 
     ;debug
     printFloat ebx+Y
 
-    ; calc new speed
+; calc new speed
     fld qword [ebx+speed]
     fld qword [delta_speed]
     faddp
     fstp qword [ebx+speed]
-    checkBorders ebx+speed
+    checkBorders ebx+speed, hundred
 
     ;debug
+    printFloat delta_speed
     printFloat ebx+speed
 
-    ; calc new angle
+; calc new angle
     fld qword [ebx+angle]
     fld qword [delta_angle]
     faddp
     fstp qword [ebx+angle]
-    
-    fld qword [ebx+angle]
-    fld dword [_360]
-    fcomip
-    jb .subAngle
-    fld dword [zero]
-    fcomip
-    ja .addAngle
-    jmp .goodAngle
-    
-    .subAngle:
-        fsub dword [_360]
-        jmp .goodAngle
-    .addAngle:
-        fadd dword [_360]
-    .goodAngle:
-        fstp qword [ebx+angle]
+    checkBorders ebx+angle, _360
 
+    ;degug
+    printFloat delta_angle
+    printFloat ebx+angle
 
+; may destroy
+    push ebx
+    push dword [ebx+Y+4]
+    push dword [ebx+Y]
+    push dword [ebx+X+4]
+    push dword [ebx+X]
+    call mayDestroy
+    add esp, 16
+    pop ebx
     
+    cmp eax, 1
+    jl .no_score
+    fld qword [ebx+score]
+    fld dword [one]
+    faddp
+    fstp qword [ebx+score]
+
+    .no_score:
     moveSchedulerToEbx
     call resume
     jmp droneFunc
+

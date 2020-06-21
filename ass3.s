@@ -20,6 +20,7 @@ global targetX
 global targetY
 global numOfActiveDrones
 global CURR
+global d
 global BOARDSIZE
 global float_format
 extern malloc 
@@ -244,12 +245,12 @@ main:
         mov [ebx+score], ecx
         ;set activnse to 1 (true)
         mov [ebx+active], dword 1
-                                            ; printFloat ebx+X
-                                            ; printFloat ebx+Y
-                                            ; printFloat ebx+angle
-                                            ; printFloat ebx+speed
-                                            ; printInt [ebx+score]     
-                                            ; printInt [ebx+active]
+                                            printFloat ebx+X
+                                            printFloat ebx+Y
+                                            printFloat ebx+angle
+                                            printFloat ebx+speed
+                                            printInt [ebx+score]     
+                                            printInt [ebx+active]
         ; loop .activeLoop, ecx
         dec ecx
         cmp ecx, 0
