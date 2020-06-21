@@ -165,8 +165,6 @@ schedulerFunc:
                 call resume
         ;     ;debug>
 
-
-
             jmp endCo
             .notwinner:
             dec ecx
