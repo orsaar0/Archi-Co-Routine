@@ -181,7 +181,7 @@ droneFunc:
     add esp, 16
     pop ebx
     
-    printInt eax
+    ; printInt eax
     cmp eax, 1
     jl .no_score
     inc dword [ebx+score]

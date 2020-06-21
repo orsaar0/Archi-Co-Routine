@@ -72,17 +72,13 @@ mayDestroy:
     finit
     fld qword [ebp+8]       ; X point
     fld qword [targetX]
-    fsub                   ; X - targetX
+    fsubp                   ; X - targetX
     fmul ST0                   ; ST(0) <- (X-targetX)^2
     fld qword [ebp+16]      ; Y point
     fld qword [targetY]
     fsubp
     fmul ST0                   ; ST(0) <- (Y-targetY)^2, ST(1) <- (X-targetX)^2
     faddp                   ; ST(0) <- (Y-targetY)^2 + (X-targetX)^2
-    ;debug
-    fst qword [debugFloat]
-    printFloat debugFloat
-    ;
     fld qword [d]           
     fmul ST0                   ; ST(0) <- d^2, ST(1) <- (Y-targetY)^2 + (X-targetX)^2
     fcomip

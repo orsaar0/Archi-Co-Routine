@@ -32,8 +32,14 @@ extern CURRDRONE
         add ebx, eax    ;ebx <- co's struct
 %endmacro
 printFormat: db "[%d]: %2f, %2f, %2f, %2f, %d, %d",10,0
+newline: db 10,0
 printerFunc:
-        printInt -1
+        pushad
+        push newline
+        call printf
+        add esp, 4
+        popad
+
         mov ecx, [N]
         .printDronesLoop:
         mov eax, ecx
