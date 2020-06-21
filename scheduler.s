@@ -66,21 +66,21 @@ schedulerFunc:
         call resume
         .droneNotActive:
 
-    ;####Printer#####
-        mov eax, [i]
-        mov edx,0
-        mov ebx, [K]
-        div ebx     ;edx<- i%K
-        cmp edx, 0
-        jne .noTimeToPrint
-        mov ebx, [COs]
-        mov eax, [N]        ;eax        <- curr drone ID
-        inc eax             ;eax <N+1
-        mov ecx, 8
-        mul ecx         ;eax <- co's 8*ID
-        add ebx, eax    ;ebx <- COs[printer]
-        call resume
-        .noTimeToPrint:
+    ; ;####Printer#####
+    ;     mov eax, [i]
+    ;     mov edx,0
+    ;     mov ebx, [K]
+    ;     div ebx     ;edx<- i%K
+    ;     cmp edx, 0
+    ;     jne .noTimeToPrint
+    ;     mov ebx, [COs]
+    ;     mov eax, [N]        ;eax        <- curr drone ID
+    ;     inc eax             ;eax <N+1
+    ;     mov ecx, 8
+    ;     mul ecx         ;eax <- co's 8*ID
+    ;     add ebx, eax    ;ebx <- COs[printer]
+    ;     call resume
+    ;     .noTimeToPrint:
 
     ;#####elimination####
         mov eax, [i]

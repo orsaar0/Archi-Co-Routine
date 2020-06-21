@@ -33,6 +33,7 @@ extern CURRDRONE
 %endmacro
 printFormat: db "[%d]: %2f, %2f, %2f, %2f, %d, %d",10,0
 printerFunc:
+        printInt -1
         mov ecx, [N]
         .printDronesLoop:
         mov eax, ecx

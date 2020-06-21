@@ -3,7 +3,6 @@ extern seed
 extern MAXINT
 extern random
 extern BOARDSIZE
-extern _360
 extern resume
 extern COs
 extern N
@@ -74,6 +73,7 @@ ten: dd 10.0
 sixty: dd 60.0
 hundred_twenty: dd 120.0
 one: dd 1.0
+_360: dd 360.0
 section .bss
 delta_angle: resq 1
 delta_speed: resq 1
@@ -105,7 +105,7 @@ droneFunc:
     fstp qword [delta_speed]
     
 ; get curr drone ptr -> ebx
-    printInt [CURRDRONE]
+    ; printInt [CURRDRONE]
     mov ebx, [drones]
     mov eax, [CURRDRONE]
     mov edx, droneSize
@@ -128,7 +128,7 @@ droneFunc:
     checkBorders ebx+X, hundred
 
     ;debug
-    printFloat ebx+X
+    ; printFloat ebx+X
 
     fld qword [ebx+speed]
     fmulp                   ; st(0) <- speed*(sin(angle))
@@ -138,7 +138,7 @@ droneFunc:
     checkBorders ebx+Y, hundred
 
     ;debug
-    printFloat ebx+Y
+    ; printFloat ebx+Y
 
 ; calc new speed
     fld qword [ebx+speed]
@@ -149,7 +149,7 @@ droneFunc:
 
     ;debug
     ; printFloat delta_speed
-    printFloat ebx+speed
+    ; printFloat ebx+speed
 
 ; calc new angle
     fld qword [ebx+angle]
@@ -158,14 +158,14 @@ droneFunc:
     fstp qword [ebx+angle]
     checkBorders ebx+angle, _360
 
-    ;degug
+    ;debug
     ; printFloat delta_angle
-    printFloat ebx+angle
+    ; printFloat ebx+angle
 
 .loop:
     finit
 ; get curr drone ptr -> ebx
-    printInt [CURRDRONE]
+    ; printInt [CURRDRONE]
     mov ebx, [drones]
     mov eax, [CURRDRONE]
     mov edx, droneSize
@@ -181,9 +181,11 @@ droneFunc:
     add esp, 16
     pop ebx
     
+    printInt eax
     cmp eax, 1
     jl .no_score
     inc dword [ebx+score]
+    
     
     push ebx
     ; call target CO
@@ -218,8 +220,7 @@ droneFunc:
     fmul dword [twenty]
     fld dword [ten]
     fsubp
-    fstp qword [delta_speed]
-    
+    fstp qword [delta_speed]    
 
 
 ; calc new position
@@ -238,7 +239,7 @@ droneFunc:
     checkBorders ebx+X, hundred
 
     ;debug
-    printFloat ebx+X
+    ; printFloat ebx+X
 
     fld qword [ebx+speed]
     fmulp                   ; st(0) <- speed*(sin(angle))
@@ -248,7 +249,7 @@ droneFunc:
     checkBorders ebx+Y, hundred
 
     ;debug
-    printFloat ebx+Y
+    ; printFloat ebx+Y
 
 ; calc new speed
     fld qword [ebx+speed]
@@ -259,7 +260,7 @@ droneFunc:
 
     ;debug
     ; printFloat delta_speed
-    printFloat ebx+speed
+    ; printFloat ebx+speed
 
 ; calc new angle
     fld qword [ebx+angle]
@@ -268,9 +269,9 @@ droneFunc:
     fstp qword [ebx+angle]
     checkBorders ebx+angle, _360
 
-    ;degug
+    ;debug
     ; printFloat delta_angle
-    printFloat ebx+angle
+    ; printFloat ebx+angle
 moveSchedulerToEbx
 call resume
 jmp .loop
