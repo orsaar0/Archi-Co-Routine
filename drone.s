@@ -3,7 +3,6 @@ extern seed
 extern MAXINT
 extern random
 extern BOARDSIZE
-extern _360
 extern resume
 extern COs
 extern N
@@ -74,6 +73,7 @@ ten: dd 10.0
 sixty: dd 60.0
 hundred_twenty: dd 120.0
 one: dd 1.0
+_360: dd 360.0
 section .bss
 delta_angle: resq 1
 delta_speed: resq 1
@@ -218,8 +218,7 @@ droneFunc:
     fmul dword [twenty]
     fld dword [ten]
     fsubp
-    fstp qword [delta_speed]
-    
+    fstp qword [delta_speed]    
 
 
 ; calc new position
