@@ -242,7 +242,7 @@ main:
         fimul dword [BOARDSIZE]
         fstp qword [ebx+speed]
         ;set score for debuging
-        mov [ebx+score], ecx
+            ; mov [ebx+score], ecx
         ;set activnse to 1 (true)
         mov [ebx+active], dword 1
                                             printFloat ebx+X
@@ -397,7 +397,7 @@ startCo:
     mov edx, 8
     mul edx             ;eax <- co's 8*ID
     add ebx, eax    ;ebx <- co's struct address
-    jmp do_resume   
+    jmp do_resume   ;call scheduler's CO
 endCo:
     mov ESP, [SPMAIN] ; restore ESP of main()
     popad ; restore registers of main()

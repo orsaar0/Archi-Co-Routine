@@ -31,16 +31,16 @@ extern CURRDRONE
         mul edx         ;;eax <- co's 8*ID
         add ebx, eax    ;ebx <- co's struct
 %endmacro
-printFormat: db "%2f, %2f, %2f, %2f, %d, %d",10,0
+printFormat: db "[%d]: %2f, %2f, %2f, %2f, %d, %d",10,0
 printerFunc:
         mov ecx, [N]
-        .initDronesLoop:
+        .printDronesLoop:
         mov eax, ecx
         dec eax
         mov edx , droneSize
         mul edx
         mov ebx, [drones]
-        add ebx, eax
+        add ebx, eax    ;ebx<- drones[i]
         pushad
         push dword [ebx+active]
         push dword [ebx+score]
@@ -52,9 +52,10 @@ printerFunc:
         push dword [ebx+Y]
         push dword [ebx+X +4]
         push dword [ebx+X]
+        push dword ecx
         push dword printFormat
         call printf
-        add esp, 44
+        add esp, 48
         popad
         ; printFloat ebx+X
         ; printFloat ebx+Y
@@ -65,7 +66,7 @@ printerFunc:
         ; loop .activeLoop, ecx
         dec ecx
         cmp ecx, 0
-        jne .initDronesLoop
+        jne .printDronesLoop
     moveSchedulerToEbx
     call resume
     jmp printerFunc
