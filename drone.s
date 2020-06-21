@@ -113,6 +113,7 @@ droneFunc:
     add ebx, eax    ;ebx<-drones[i]
 
 ; calc new position
+    finit
     fld qword [ebx+angle]
     fldpi
     fmulp
@@ -147,7 +148,7 @@ droneFunc:
     checkBorders ebx+speed, hundred
 
     ;debug
-    printFloat delta_speed
+    ; printFloat delta_speed
     printFloat ebx+speed
 
 ; calc new angle
@@ -158,9 +159,18 @@ droneFunc:
     checkBorders ebx+angle, _360
 
     ;degug
-    printFloat delta_angle
+    ; printFloat delta_angle
     printFloat ebx+angle
 
+.loop:
+    finit
+; get curr drone ptr -> ebx
+    printInt [CURRDRONE]
+    mov ebx, [drones]
+    mov eax, [CURRDRONE]
+    mov edx, droneSize
+    mul edx         ;currdrone id * dronesize
+    add ebx, eax    ;ebx<-drones[i]
 ; may destroy
     push ebx
     push dword [ebx+Y+4]
@@ -173,13 +183,95 @@ droneFunc:
     
     cmp eax, 1
     jl .no_score
-    fld qword [ebx+score]
-    fld dword [one]
-    faddp
-    fstp qword [ebx+score]
+    inc dword [ebx+score]
+    
+    push ebx
+    ; call target CO
+        mov eax, [N]
+        mov edx, 8
+        mul edx         ;eax <- co's 8*ID
+        mov ebx, [COs]
+        add ebx, eax    ;ebx <- COs[i]
+        call resume
+    pop ebx
 
-    .no_score:
-    moveSchedulerToEbx
-    call resume
-    jmp droneFunc
+.no_score:
+; set random delta angle
+    pushad
+    call random
+    popad
+    fild dword [seed]
+    fild dword [MAXINT]
+    fdivp
+    fmul dword [hundred_twenty]
+    fld dword [sixty]
+    fsubp
+    fstp qword [delta_angle]
+
+; set random delta speed
+    pushad
+    call random
+    popad
+    fild dword [seed]
+    fild dword [MAXINT]
+    fdivp
+    fmul dword [twenty]
+    fld dword [ten]
+    fsubp
+    fstp qword [delta_speed]
+    
+
+
+; calc new position
+    finit
+    fld qword [ebx+angle]
+    fldpi
+    fmulp
+    fld dword [one_eighty]
+    fdivp
+    fsincos                 ; st(1) <- sin(angle), s(0) <- cos(angle)
+    fld qword [ebx+speed]
+    fmulp                   ; st(0) <- speed*(cos(angle))
+    fld qword [ebx+X]
+    faddp                   ; st(0) <- currX + speed*(cos(angle))
+    fstp qword [ebx+X]
+    checkBorders ebx+X, hundred
+
+    ;debug
+    printFloat ebx+X
+
+    fld qword [ebx+speed]
+    fmulp                   ; st(0) <- speed*(sin(angle))
+    fld qword [ebx+Y]
+    faddp                   ; st(0) <- currY + speed*(sin(angle))  
+    fstp qword [ebx+Y]
+    checkBorders ebx+Y, hundred
+
+    ;debug
+    printFloat ebx+Y
+
+; calc new speed
+    fld qword [ebx+speed]
+    fld qword [delta_speed]
+    faddp
+    fstp qword [ebx+speed]
+    checkBorders ebx+speed, hundred
+
+    ;debug
+    ; printFloat delta_speed
+    printFloat ebx+speed
+
+; calc new angle
+    fld qword [ebx+angle]
+    fld qword [delta_angle]
+    faddp
+    fstp qword [ebx+angle]
+    checkBorders ebx+angle, _360
+
+    ;degug
+    ; printFloat delta_angle
+    printFloat ebx+angle
+moveSchedulerToEbx
+call resume
+jmp .loop
 

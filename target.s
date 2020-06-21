@@ -65,6 +65,7 @@ targetFunc:
 mayDestroy:
     push ebp
     mov ebp, esp
+    mov eax, 0
 
     fld qword [ebp+8]       ; X point
     fld qword [targetX]
@@ -79,14 +80,8 @@ mayDestroy:
     fsqrt                   ; ST(0) <- d^2, ST(1) <- (Y-targetY)^2 + (X-targetX)^2
     fcomip
     ja .cant_destroy
-    mov eax, [N]
-    mov edx, 8
-    mul edx         ;eax <- co's 8*ID
-    mov ebx, [COs]
-    add ebx, eax    ;ebx <- COs[i]
-    call resume
+    
 
-    mov eax, 0
     inc eax
     .cant_destroy:
     mov esp, ebp
