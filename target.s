@@ -33,6 +33,8 @@ extern float_format
     add esp, 8
     popad
 %endmacro
+section .bss
+debugFloat: resq 1
 section .text
 SPP equ 4           ; offset of pointer to co-routine stack in co-routine struct 
 targetFunc:
@@ -67,22 +69,27 @@ mayDestroy:
     mov ebp, esp
     mov eax, 0
 
+    finit
     fld qword [ebp+8]       ; X point
     fld qword [targetX]
-    fsubp                   ; X - targetX
-    fsqrt                   ; ST(0) <- (X-targetX)^2
+    fsub                   ; X - targetX
+    fmul ST0                   ; ST(0) <- (X-targetX)^2
     fld qword [ebp+16]      ; Y point
     fld qword [targetY]
-    fsubp                   ; Y - targetY
-    fsqrt                   ; ST(0) <- (Y-targetY)^2, ST(1) <- (X-targetX)^2
+    fsubp
+    fmul ST0                   ; ST(0) <- (Y-targetY)^2, ST(1) <- (X-targetX)^2
     faddp                   ; ST(0) <- (Y-targetY)^2 + (X-targetX)^2
+    ;debug
+    fst qword [debugFloat]
+    printFloat debugFloat
+    ;
     fld qword [d]           
-    fsqrt                   ; ST(0) <- d^2, ST(1) <- (Y-targetY)^2 + (X-targetX)^2
+    fmul ST0                   ; ST(0) <- d^2, ST(1) <- (Y-targetY)^2 + (X-targetX)^2
     fcomip
-    ja .cant_destroy
+    jb .cant_destroy
     
 
-    inc eax
+    mov eax, 1              ; eax <- true
     .cant_destroy:
     mov esp, ebp
     pop ebp
