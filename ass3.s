@@ -37,6 +37,8 @@ section	.rodata         ;constats
     float_format: db "%2f",10,0
     hexa_format: db "%X",10,0
     argc_unmached: db "ERROR- 5 args is needed",10,0
+    atleast2drones: db "ERROR- 'N' should be at least 2",10,0
+
     MAXINT: dd 65535
     BOARDSIZE: dd 100
     _360: dd 360
@@ -183,6 +185,10 @@ main:
     my_sscanf1 ebx, int_format, N
     mov edx, [N]
     mov [numOfActiveDrones], edx
+    cmp edx, 2
+    jge .continue
+    errorExit atleast2drones
+    .continue:
     mov ebx, [eax+8]            ;ebx <- argv[2]
     my_sscanf1 ebx, int_format, R
     mov ebx, [eax+12]            ;ebx <- argv[3]
